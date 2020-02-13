@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 
 First, you will have to perform the following steps to create a clean version of the data (see below for suggestions about which libraries to use):
@@ -25,6 +27,26 @@ If you don't yet have a working copy of Python of our computer, please see the e
 You will want to use the following python packages for performing these tasks:
 clean-text - for cleaning the text (https://pypi.org/project/clean-text/)
 datetime - for date/time conversions (https://docs.python.org/3/library/datetime.html)"""
+
+import pandas as pd
+from cleantext import clean
+
+sample_data = pd.read_csv("news_sample.csv")
+
+# We wanna make an array of arrays, with the tokenization of one content field, being in one array. 
+
+
+array = []
+
+for i in range(len(sample_data)):
+	token_array = []
+	dirty_content = sample_data.at[i,'content']
+	dirty_content.replace("\n", " ")
+	clean_content = clean(dirty_content, lower=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
+	token_array.append(clean_content)
+	array.append(token_array)
+
+print(array[1])
 
 
 
