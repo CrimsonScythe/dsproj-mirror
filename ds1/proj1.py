@@ -48,8 +48,11 @@ for i in range(len(sample_data)):
 
     if (i == 1):
         print(clean_content)
-        x = re.match("\b(?:Jan(?:uary)?|Feb(?:ruary)?|Dec(?:ember)?) (?:[0-31]\d[,]) (?:19[7-9]\d|2\d{3})(?=\D|$)", clean_content)
-        print(x)
+        x = re.findall(r'\b(?:Jan(?:uary)?|Feb(?:ruary)?|Dec(?:ember)?) (?:[0-31]\d[,]) (?:19[7-9]\d|2\d{3}) (?=\D|$)', clean_content)
+        if x:
+            print(x)
+        else:
+            print("!s")
         # matches = datefinder.find_dates(clean_content)
         # for match in matches:
             # print(match)
