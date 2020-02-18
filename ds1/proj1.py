@@ -30,6 +30,9 @@ datetime - for date/time conversions (https://docs.python.org/3/library/datetime
 
 import pandas as pd
 from cleantext import clean
+import datetime
+import datefinder
+import re
 
 sample_data = pd.read_csv("news_sample.csv")
 
@@ -41,8 +44,23 @@ for i in range(len(sample_data)):
     token_array = []
     dirty_content = sample_data.at[i,'content']
     # dirty_content.replace("\n", " ")
-    clean_content = clean(dirty_content, lower=True, no_urls = True, no_numbers=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
+    clean_content = clean(dirty_content, lower=False, no_urls = True, no_numbers=False, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
+
+    if (i == 1):
+        print(clean_content)
+        x = re.match("\b(?:Jan(?:uary)?|Feb(?:ruary)?|Dec(?:ember)?) (?:[0-31]\d[,]) (?:19[7-9]\d|2\d{3})(?=\D|$)", clean_content)
+        print(x)
+        # matches = datefinder.find_dates(clean_content)
+        # for match in matches:
+            # print(match)
+
+        # print(matches)
+        # dT = datetime.datetime.strptime(clean_content, "%B")
+        # print(dT)
+
+    clean_content = clean(dirty_content, lower=True, no_urls = True, no_numbers=True, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
+
     token_array.append(clean_content)
     array.append(token_array)
 
-print(array[1])
+# print(array[1])
