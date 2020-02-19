@@ -30,7 +30,7 @@ datetime - for date/time conversions (https://docs.python.org/3/library/datetime
 
 import pandas as pd
 from cleantext import clean
-import datetime
+from datetime import datetime
 import datefinder
 import re
 
@@ -39,29 +39,29 @@ sample_data = pd.read_csv("news_sample.csv")
 # We wanna make an array of arrays, with the tokenization of one content field, being in one array.
 
 array = []
-
+months = r'\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may(?:ch)?|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|sept(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:[.,]?) '
+days = '(?:[0-31]\d[,.]?) '
+year = '?(?:19[7-9]\d|2\d{3})? '
 for i in range(len(sample_data)):
     token_array = []
     dirty_content = sample_data.at[i,'content']
     # dirty_content.replace("\n", " ")
-    clean_content = clean(dirty_content, lower=False, no_urls = True, no_numbers=False, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
+    clean_content = clean(dirty_content, lower=True, no_urls = True, no_numbers=False, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
 
     if (i == 1):
-        print(clean_content)
-        x = re.findall(r'\b(?:Jan(?:uary)?|Feb(?:ruary)?|Dec(?:ember)?) (?:[0-31]\d[,]) (?:19[7-9]\d|2\d{3}) (?=\D|$)', clean_content)
+        x = re.sub(months+days+year+'(?=\D|$)', '<DATE>' ,clean_content)
+        # if successful assign clean_content to x
         if x:
-            print(x)
-        else:
-            print("!s")
-        # matches = datefinder.find_dates(clean_content)
-        # for match in matches:
-            # print(match)
+            clean_content = x
+        # make another call to re.sub with a different ordering of the regex
+        # out of a conditional since it doesn't need to depend on the result of the previous
+        # call
+        x = re.sub(days+months+year+'(?=\D|$)', '<DATE>' ,clean_content)
+        if x:
+            clean_content = x
 
-        # print(matches)
-        # dT = datetime.datetime.strptime(clean_content, "%B")
-        # print(dT)
-
-    clean_content = clean(dirty_content, lower=True, no_urls = True, no_numbers=True, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
+    # call clean() again to replace numbers with arg being clean_content
+    clean_content = clean(clean_content, lower=True, no_urls = True, no_numbers=True, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
 
     token_array.append(clean_content)
     array.append(token_array)
