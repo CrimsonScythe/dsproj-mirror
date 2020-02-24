@@ -1,54 +1,41 @@
+import numpy
 
-# 5 beers
-# Ways to spend 5 DKK: 
-
-#              |			   
-# [1, 2, 2, 3, 5]
-#        |  |
-# [1, 2, 2, 3, 5]
-#     |     |
-# [1, 2, 2, 3, 5]
-#  |  |  |
-# [1, 2, 2, 3, 5]
-
-# Total of 4 ways
-
-p = [2, 3, 2, 1, 4]
-
+p = [2, 3, 7, 2, 8, 9, 1, 10]
+# = [1, 2, 2, 3, 7, 8, 9, 10]
 
 def N(C, i):
-
 	if C == 0:
-		print("We used all our money up, great! Have a 1, will ya??")
 		return 1
 
+	# Assumptions:
+	# - We ran out of items.
+	# - We didn't succed at using all money, 
+	#   otherwise if statement above would catch.
 	elif i < 0:
-		print("We're out of beers to buy!")
 		return 0
 
-	print("I currently have", C, "money and have the option of buying a beer with price", p[i])
-	# Inverted if-statement.
-	# No more beers, no more money to spend. 
-	# Should be possible to combine them into one.
+	return N(C-p[i], i-1) + N(C, i-1)
 
-	if C == p[i]:
-		print("Bought beer", i, "with price", p[i])
-		return 1 + N(C, i-1)
+print("Recursive formula:")
+print(N(10, len(p)-1))
+# returns 7
 
-	if p[i] <= C:
-		print("Bought beer nr.", i, "with the cost ", p[i])
-		return N(C-p[i], i-1)
+def DP(C, p):
+    mem = numpy.zeros((len(p), C))
+    for beer in range(len(p)):
+        for coin in range(C):
+            # +1 for offsetting 0-index.
+            if p[beer] == coin + 1:
+                mem[beer, coin] = mem[beer-1, coin] + 1
 
+            elif coin+1 > p[beer]:
+                mem[beer, coin] = mem[beer-1, coin - p[beer]] + mem[beer-1, coin]
 
-	return 0
+            elif coin+1 < p[beer]:
+                mem[beer, coin] = mem[beer-1, coin]
+    print(mem)       
+    return mem[-1, -1]
 
-	"""
-	elif p[i] != C: 
-		print("didn't buy the beer")
-		return 0 + N(C, i-1)
-	"""
-
-print(N(5, 4))
-
-
+print("Memoization:")
+DP(10, p)
 
