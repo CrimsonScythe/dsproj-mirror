@@ -29,6 +29,7 @@ clean-text - for cleaning the text (https://pypi.org/project/clean-text/)
 datetime - for date/time conversions (https://docs.python.org/3/library/datetime.html)"""
 
 import pandas as pd
+import numpy as np
 from cleantext import clean
 from datetime import datetime
 import datefinder
@@ -42,6 +43,7 @@ array = []
 months = r'\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may(?:ch)?|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|sept(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:[.,]?) '
 days = '(?:[0-31]\d[,.]?) '
 year = '?(?:19[7-9]\d|2\d{3})? '
+white_space = '^\s*$'
 for i in range(len(sample_data)):
     token_array = []
     dirty_content = sample_data.at[i,'content']
@@ -63,7 +65,17 @@ for i in range(len(sample_data)):
     # call clean() again to replace numbers with arg being clean_content
     clean_content = clean(clean_content, lower=True, no_urls = True, no_numbers=True, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
 
+    clean_content = clean_content.split()
+
     token_array.append(clean_content)
     array.append(token_array)
+# print(array)
 
-# print(array[1])
+meta_data = pd.read_csv("news_sample.csv", usecols = ['meta_description'])
+# print(meta_data)
+meta_data_cleaned = meta_data.replace(np.nan, 'NULL', regex=True)
+# print(meta_data_cleaned)
+meta_con = pd.read_csv("news_sample.csv", usecols = ['meta_keywords'])
+# print(meta_con)
+meta_con_cleaned = meta_con.replace('[\'\']', 'NULL')
+# print(meta_con_cleaned)
