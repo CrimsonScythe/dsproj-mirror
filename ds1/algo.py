@@ -1,4 +1,4 @@
-
+import numpy
 # 5 beers
 # Ways to spend 5 DKK:
 
@@ -21,6 +21,10 @@ def N(C, i):
 	if (C == 0):
 		return 1
 
+	# Assumptions:
+	# - We ran out of items.
+	# - We didn't succed at using all money, 
+	#   otherwise if statement above would catch.
 	elif i < 0:
 		return 0
 
