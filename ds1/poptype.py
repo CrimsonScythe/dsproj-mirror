@@ -17,7 +17,7 @@ import psycopg2
 import math
 
 # load data
-sample_data = pd.read_csv("1mio-raw.csv", usecols = ['type'])
+sample_data = pd.read_csv("news_sample.csv", usecols = ['type'])
 
 sample_data_cleaned = sample_data.replace(np.nan, '<NULL>', regex=True)
 
