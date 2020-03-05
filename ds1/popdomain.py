@@ -17,7 +17,7 @@ import psycopg2
 import math
 
 # load data
-sample_data = pd.read_csv("1mio-raw.csv", usecols = ['keywords'])
+sample_data = pd.read_csv("1mio-raw.csv", usecols = ['domain'])
 
 sample_data_cleaned = sample_data.replace(np.nan, '<NULL>', regex=True)
 
@@ -51,14 +51,14 @@ sample_data_cleaned = sample_data.replace(np.nan, '<NULL>', regex=True)
 
 # cleaned data is converted to CSV
 # 
-sample_data_cleaned.to_csv('keywords.csv', index=True, header=False)
+sample_data_cleaned.to_csv('domain.csv', index=True, header=False)
 
 # CSV is opened so it can be copied
-f = open('keywords.csv', encoding="utf8")
+f = open('domain.csv', encoding="utf8")
 
 # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor() 
-cur.copy_from(f, 'keyword', sep=',')
+cur.copy_from(f, 'domain', sep=',')
 conn.commit()
 cur.close()

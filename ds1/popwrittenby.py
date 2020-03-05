@@ -14,40 +14,28 @@ import datefinder
 import re
 import csv
 import psycopg2
+import math
 
 # load data
 sample_data = pd.read_csv("1mio-raw.csv", usecols = ['authors'])
 
-# we clean the data by
-# keeping only the first name and discarding the rest
-
-for i in range(len(sample_data)):
-    dirty_authors = sample_data.at[i, 'authors']
-
-    if pd.isnull(dirty_authors):
-        # print(dirty_authors)
-        sample_data.at[i, 'authors'] = '<NULL>'
-
-    if not pd.isnull(dirty_authors):
-        if ("," in dirty_authors):
-            splitted = dirty_authors.split(',')    
-            sample_data.at[i, 'authors'] = splitted[0]
-        else :
-            if (dirty_authors.split() != 2):
-                sample_data.at[i, 'authors'] = dirty_authors.split()[0] 
-            # print(dirty_authors)
-
-
 
 # cleaned data is converted to CSV
-sample_data.to_csv('authors.csv', index=True, header=False)
+# 
+# sample_data_cleaned.to_csv('type.csv', index=True, header=False)
 
 # CSV is opened so it can be copied
-f = open('authors.csv', encoding="utf8")
+# f = open('type.csv', encoding="utf8")
 
 # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor() 
-cur.copy_from(f, 'author', sep=',')
+# cur.copy_from(f, 'type', sep=',')
+query = """ INSERT INTO written_by (article_id, author_id) VALUES (%s, %s)"""
+
+for i in range(len(sample_data)):
+    vals = (i, i)
+    cur.execute(query, vals)
+
 conn.commit()
 cur.close()
