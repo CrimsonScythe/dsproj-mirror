@@ -21,35 +21,6 @@ sample_data = pd.read_csv("1mio-raw.csv", usecols = ['domain'])
 
 sample_data_cleaned = sample_data.replace(np.nan, '<NULL>', regex=True)
 
-
-# we clean the data by
-# keeping only the first name and discarding the rest
-# sample_data = sample_data.replace('nan', 'isa', regex=True, inplace=True)  
-# for i in range(len(sample_data)):
-    # dirty_authors = sample_data.at[i, 'keywords']   
-    # print(dirty_authors)
-    # if math.isnan(float(dirty_authors)):
-        # sample_data.at[i, 'keywords'] = '<NULL>'
-    # if pd.isnull(dirty_authors):
-        # print(dirty_authors)
-        # sample_data.at[i, 'keywords'] = '<NULL>'
-
-        # print("yes!")
-        #     print(dirty_authors)
-        #     print(sample_data.at[i, 'keywords'])
-        
-    # if not pd.isnull(dirty_authors):
-    #     if ("," in dirty_authors):
-    #         splitted = dirty_authors.split(',')    
-    #         sample_data.at[i, 'authors'] = splitted[0]
-    #     else :
-    #         if (dirty_authors.split() != 2):
-    #             sample_data.at[i, 'authors'] = dirty_authors.split()[0] 
-            
-
-
-
-# cleaned data is converted to CSV
 # 
 sample_data_cleaned.to_csv('domain.csv', index=True, header=False)
 

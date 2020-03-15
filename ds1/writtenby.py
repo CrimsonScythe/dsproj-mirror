@@ -53,53 +53,6 @@ sample_data['summary'] = sample_data['summary'].to_frame().replace('[,]', '\,', 
 sample_data['meta_description'] = sample_data['meta_description'].to_frame().replace(np.nan, '<NULL>', regex=True)
 sample_data['meta_description'] = sample_data['meta_description'].to_frame().replace('[,]', '\,', regex=True)
 
-# sample_data['type'] = sample_data['type'].to_frame().replace(np.nan, 'unknown', regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('unreliable', 0, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('reliable', 1, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('fake', 2, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('conspiracy', 3, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('bias', 4, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('hate', 5, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('junksci', 6, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('political', 7, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('clickbait', 8, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('unknown', 9, regex=True)
-  
-  
-    #
-    #  if (i == 0):
-        # print(sample_data.at[i,'content'])
-
-    
-    # STARTING WITH * HERE
-    # sample_data.at[i,'title'] = clean(sample_data.at[i,'title'], lower=True, no_urls = True, no_numbers=True, no_line_breaks=True,
-    #  replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
- 
-    
-# sample_data['summary'] = sample_data['summary'].replace(np.nan, '<NULL>', regex=True)
- 
-# sample_data['summary'] = clean(sample_data['summary'], lower=True, no_urls = True, no_numbers=True, no_line_breaks=True,
-#      replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True) 
-#     # token_array.append(clean_content)
-#     # array.append(token_array)
-
-#     # STARTING HERE WITH META
-# sample_data['meta_description'] = sample_data['meta_description'].replace(np.nan, '<NULL>', regex=True)
-# sample_data['meta_description'] = clean(sample_data['meta_description'], lower=True, no_urls = True, no_numbers=True, no_line_breaks=True,
-#      replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True) 
-# print(array)
-# print(array)
-
-# meta_data = pd.read_csv("news_sample.csv", usecols = ['meta_description'])
-# print(meta_data)
-# meta_data_cleaned = meta_data.replace(np.nan, 'NULL', regex=True)
-# print(meta_data_cleaned)
-# meta_con = pd.read_csv("news_sample.csv", usecols = ['meta_keywords'])
-# print(meta_con)
-# meta_con_cleaned = meta_con.replace('[\'\']', 'NULL')
-# print(meta_con_cleaned)
-
-# print(sample_data['content'])
 
 
 
@@ -108,12 +61,6 @@ sample_data['meta_description'] = sample_data['meta_description'].to_frame().rep
 # sample_data['url'].to_frame().to_csv('web.csv', index=True, header=False)
 sample_data['id'].to_frame().to_csv('new.csv', index=True, header=False)
 
-# val = sample_data['id'].to_frame().join(dfs)
-# val.to_csv('web.csv', index=True, header=False)
-
-# sample_data['content'].to_csv('articlecontent.csv', index=False, header=True)
-
-# print(val)
 
 # CSV is opened so it can be copied
 f = open('new.csv', encoding="utf8")

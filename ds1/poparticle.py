@@ -5,14 +5,14 @@ from datetime import datetime
 import datefinder
 import re
 import psycopg2
+import time
+import math
 
-# sample_data = pd.read_csv("1mio-raw.csv", dtype={'id': int, 'domain': object, 'type': object, 'url': object, 'content': object,
-# 'scraped_at': object, 'inserted_at': object, 'updated_at': object, 'title': object, 'authors': object, 'keywords': object, 'meta_description': object,
-# 'tags': object, 'summary': object})
+chunksize = 1
 
-
-sample_data = pd.read_csv("news_sample.csv")
-
+col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
+chunk = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=col_names, low_memory=True)
+sample_data = pd.concat(chunk, ignore_index=True)
 # We wanna make an array of arrays, with the tokenization of one content field, being in one array.
 
 array = []
@@ -20,102 +20,79 @@ months = r'\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may(?:ch)?|jun(
 days = r'(?:[0-31]\d[,.]?) '
 year = r'?(?:19[7-9]\d|2\d{3})? '
 white_space = r'^\s*$'
+
+col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
+df  = pd.DataFrame(columns = col_names)
+
 for i in range(len(sample_data)):
+    
     token_array = []
     dirty_content = sample_data.at[i,'content']
-    # dirty_content.replace("\n", " ")
-    sample_data.at[i,'content'] = clean(sample_data.at[i,'content'], lower=True, no_urls = True, no_numbers=False, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
 
-    if (i == 1):
-        x = re.sub(months+days+year+'(?=\D|$)', '<DATE>' ,sample_data.at[i,'content'])
+    print(type(sample_data.at[i,'content']))
+
+    sample_data.at[i,'content'] = clean(sample_data.at[i,'content'], lower=True, no_urls = True, no_numbers=False, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
+   
+    x = re.sub(months+days+year+'(?=\D|$)', '<DATE>' ,sample_data.at[i,'content'])
         # if successful assign clean_content to x
-        if x:
-            sample_data.at[i,'content'] = x
+    if x:
+        sample_data.at[i,'content'] = x
         # make another call to re.sub with a different ordering of the regex
         # out of a conditional since it doesn't need to depend on the result of the previous
         # call
-        x = re.sub(days+months+year+'(?=\D|$)', '<DATE>' ,sample_data.at[i,'content'])
-        if x:
-            sample_data.at[i,'content'] = x
+    x = re.sub(days+months+year+'(?=\D|$)', '<DATE>' ,sample_data.at[i,'content'])
+    if x:
+        sample_data.at[i,'content'] = x
 
     # call clean() again to replace numbers with arg being clean_content
     sample_data.at[i,'content'] = clean(sample_data.at[i,'content'], lower=True, no_urls = True, no_numbers=True, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
 
     
     # sample_data.at[i,'content'] = sample_data.at[i,'content'].split()
+
     sample_data.at[i,'content'] = re.sub('[,]', '\,' ,sample_data.at[i,'content'])
-
-    sample_data.at[i,'title'] = re.sub('[,]', '\,' ,sample_data.at[i,'title'])
-
-    # sample_data.at[i,'summary'] = re.sub('[,]', '\,' ,sample_data.at[i,'title'])
-sample_data['summary'] = sample_data['summary'].to_frame().replace(np.nan, '<NULL>', regex=True)
-sample_data['summary'] = sample_data['summary'].to_frame().replace('[,]', '\,', regex=True)
-sample_data['meta_description'] = sample_data['meta_description'].to_frame().replace(np.nan, '<NULL>', regex=True)
-sample_data['meta_description'] = sample_data['meta_description'].to_frame().replace('[,]', '\,', regex=True)
-
-# sample_data['type'] = sample_data['type'].to_frame().replace(np.nan, 'unknown', regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('unreliable', 0, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('reliable', 1, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('fake', 2, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('conspiracy', 3, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('bias', 4, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('hate', 5, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('junksci', 6, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('political', 7, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('clickbait', 8, regex=True)
-# sample_data['type'] = sample_data['type'].to_frame().replace('unknown', 9, regex=True)
-  
-  
-    #
-    #  if (i == 0):
-        # print(sample_data.at[i,'content'])
-
+       
+    # print(sample_data.at[i,'title'])
+    # NAN
+    if (not pd.isnull(sample_data.at[i,'title'])):
+        sample_data.at[i,'title'] = re.sub('[,]', '\,' ,sample_data.at[i,'title'])
     
-    # STARTING WITH * HERE
-    # sample_data.at[i,'title'] = clean(sample_data.at[i,'title'], lower=True, no_urls = True, no_numbers=True, no_line_breaks=True,
-    #  replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
- 
+    # sample_data['summary'] = sample_data['summary'].astype(str)
+
+    if (not pd.isnull(sample_data.at[i,'summary'])):
+        sample_data.at[i,'summary'] = re.sub('[,]', '\,' ,sample_data.at[i,'summary'])
+
+
+    if (not pd.isnull(sample_data.at[i,'meta_description'])):
+        sample_data.at[i,'meta_description'] = re.sub('[,]', '\,' ,sample_data.at[i,'meta_description'])
     
-# sample_data['summary'] = sample_data['summary'].replace(np.nan, '<NULL>', regex=True)
- 
-# sample_data['summary'] = clean(sample_data['summary'], lower=True, no_urls = True, no_numbers=True, no_line_breaks=True,
-#      replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True) 
-#     # token_array.append(clean_content)
-#     # array.append(token_array)
+    # print(sample_data)
+    if (i==0):
+        df = sample_data
+        
+    df.append(sample_data, ignore_index=True)
 
-#     # STARTING HERE WITH META
-# sample_data['meta_description'] = sample_data['meta_description'].replace(np.nan, '<NULL>', regex=True)
-# sample_data['meta_description'] = clean(sample_data['meta_description'], lower=True, no_urls = True, no_numbers=True, no_line_breaks=True,
-#      replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True) 
-# print(array)
-# print(array)
+df.to_csv('yolo.csv', index=False, header=False)
 
-# meta_data = pd.read_csv("news_sample.csv", usecols = ['meta_description'])
-# print(meta_data)
-# meta_data_cleaned = meta_data.replace(np.nan, 'NULL', regex=True)
-# print(meta_data_cleaned)
-# meta_con = pd.read_csv("news_sample.csv", usecols = ['meta_keywords'])
-# print(meta_con)
-# meta_con_cleaned = meta_con.replace('[\'\']', 'NULL')
-# print(meta_con_cleaned)
 
-# print(sample_data['content'])
+dfs = [
+    df['content'],
+    df['title'],
+    df['summary'], 
+    df['meta_description'],
+    df['inserted_at'],
+    df['scraped_at'],
+    df['updated_at']
+    ]
 
-dfs = [sample_data['content'].to_frame(), sample_data['title'].to_frame(), sample_data['summary'].to_frame(), 
-sample_data['meta_description'].to_frame(), sample_data['inserted_at'].to_frame(), sample_data['scraped_at'].to_frame(),
-sample_data['updated_at'].to_frame()]
 
-val = sample_data['id'].to_frame().join(dfs)
-val.to_csv('articlecontent.csv', index=False, header=False)
+val = df['id'].to_frame().join(dfs)
+val.to_csv('yolo.csv', index=False, header=False)
 
-# sample_data['content'].to_csv('articlecontent.csv', index=False, header=True)
+# # CSV is opened so it can be copied
+f = open('yolo.csv', encoding="utf8")
 
-# print(val)
-
-# CSV is opened so it can be copied
-f = open('articlecontent.csv', encoding="utf8")
-
-# writing to DB
+# # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor() 
 cur.copy_from(f, 'article', columns=('article_id', 'content', 'title', 'summary', 'meta_description', 'inserted_at',
