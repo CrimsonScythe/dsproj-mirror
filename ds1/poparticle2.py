@@ -42,7 +42,10 @@ def chunk_preprocessing(sample_data):
     # if not(sample_data['summary'].isna().item()):
     #     sample_data['summary'] = sample_data['summary'].str.lower()   
 
-
+    
+    bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
+    if (bol == False):
+        return None
     """commas, + is probably not necessary"""
     sample_data['content'].replace(to_replace=r'[,]+', value='s', regex=True, inplace=True)
 
@@ -93,19 +96,7 @@ def chunk_preprocessing(sample_data):
 
     sample_data['meta_description'].replace(to_replace=r'(\\)', value='s', regex=True, inplace=True)
 
-    """detects " because it is needed to detect EOF in CSV. the extra backslashes are needed
-    for escaping purposes"""
-    sample_data['content'].replace(to_replace=r'(\")', value='s', regex=True, inplace=True)
- 
- 
 
-    sample_data['title'].replace(to_replace=r'(\")', value='s', regex=True, inplace=True)
-
-
-    sample_data['summary'].replace(to_replace=r'(\")', value='s', regex=True, inplace=True)
-
-
-    sample_data['meta_description'].replace(to_replace=r'(\")', value='s', regex=True, inplace=True)
     
 
 
@@ -115,7 +106,7 @@ chunk_list = []
 chunksize = 2000
 
 col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
-df_chunk = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=col_names, low_memory=True, nrows=500000)
+df_chunk = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=col_names, low_memory=True, nrows=200000)
 
 array = []
 months = r'\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may(?:ch)?|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|sept(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:[.,]?) '
@@ -129,6 +120,8 @@ for chunk in df_chunk:
     
     chunk_filter = chunk_preprocessing(chunk)
 
+    if (chunk_filter is None):
+        continue
  
     i=i+1
 
