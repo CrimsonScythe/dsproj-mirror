@@ -24,23 +24,25 @@ def chunk_preprocessing(sample_data):
     # re.sub(r'([A-Z])', replacement, sample_data['content'])
     # sample_data['content'].replace(to_replace=r'([A-Z])', value='2', regex=True)
 
-    # if not(sample_data['title'].isna().item()):
-    #     sample_data['title'] = sample_data['title'].str.lower()
+    if not(sample_data['title'].isna().any()):
+        sample_data['title'] = sample_data['title'].str.lower()
 
-    # if not(sample_data['content'].isna().item()):
-    #     sample_data['content'] = sample_data['content'].str.lower()
+    if not(sample_data['content'].isna().any()):
+        sample_data['content'] = sample_data['content'].str.lower()
 
-    # if not(sample_data['meta_description'].isna().item()):
-    #     sample_data['meta_description'] = sample_data['meta_description'].str.lower()
+    if not(sample_data['meta_description'].isna().any()):
+        sample_data['meta_description'] = sample_data['meta_description'].str.lower()
 
-    # if not(sample_data['meta_keywords'].isna().item()):
-    #     sample_data['meta_keywords'] = sample_data['meta_keywords'].str.lower() 
+    if not(sample_data['meta_keywords'].isna().any()):
+        sample_data['meta_keywords'] = sample_data['meta_keywords'].str.lower() 
 
-    # if not(sample_data['tags'].isna().item()):
-    #     sample_data['tags'] = sample_data['tags'].str.lower() 
+    if not(sample_data['tags'].isna().any()):
+        sample_data['tags'] = sample_data['tags'].str.lower() 
 
-    # if not(sample_data['summary'].isna().item()):
-    #     sample_data['summary'] = sample_data['summary'].str.lower()   
+    if not(sample_data['summary'].isna().any()):
+        sample_data['summary'] = sample_data['summary'].str.lower() 
+        
+          
 
     
     bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
@@ -97,6 +99,29 @@ def chunk_preprocessing(sample_data):
     sample_data['meta_description'].replace(to_replace=r'(\\)', value='s', regex=True, inplace=True)
 
 
+    sample_data['content'].replace(to_replace=days+months+year+r'(?=\D|$)', value='<DATE>', regex=True, inplace=True)
+
+    sample_data['content'].replace(to_replace=months+days+year+r'(?=\D|$)', value='<DATE>', regex=True, inplace=True)
+
+    sample_data['title'].replace(to_replace=days+months+year+r'(?=\D|$)', value='<DATE>', regex=True, inplace=True)
+
+    sample_data['title'].replace(to_replace=months+days+year+r'(?=\D|$)', value='<DATE>', regex=True, inplace=True)
+
+    sample_data['summary'].replace(to_replace=months+days+year+r'(?=\D|$)', value='<DATE>', regex=True, inplace=True)
+
+    sample_data['content'].replace(to_replace=r'\S+@\S+', value='<EMAIL>', regex=True, inplace=True)
+
+    sample_data['summary'].replace(to_replace=r'[0-9]+', value='<NUM>', regex=True, inplace=True)
+
+    sample_data['title'].replace(to_replace=r'[0-9]+', value='<NUM>', regex=True, inplace=True)
+    
+    sample_data['content'].replace(to_replace=r'[0-9]+', value='<NUM>', regex=True, inplace=True)
+
+    sample_data['summary'].replace(to_replace=r'(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)', value='<URL>', regex=True, inplace=True)
+
+    sample_data['title'].replace(to_replace=r'(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)', value='<URL>', regex=True, inplace=True)
+    
+    sample_data['content'].replace(to_replace=r'(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)', value='<URL>', regex=True, inplace=True)
     
 
 
