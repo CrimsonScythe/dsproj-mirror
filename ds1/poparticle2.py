@@ -11,18 +11,16 @@ from io import StringIO
 
 i=0
 
+"""
+cleans data for article
+and copies the data to local db
+"""
 
 def chunk_preprocessing(sample_data):
 
     """
-    Commented out code below because it was giving trouble with nan values.
-    Will have to revisit it later when the regex part is fixed.
+    Lower case everything
     """
-
-    # sample_data.at[i,'content'] = clean(sample_data.at[i,'content'], lower=True, no_urls = True, no_numbers=False, no_line_breaks=True, replace_with_url="<URL>", replace_with_number="<NUM>", fix_unicode=True)
-    # print(type(sample_data['content']))
-    # re.sub(r'([A-Z])', replacement, sample_data['content'])
-    # sample_data['content'].replace(to_replace=r'([A-Z])', value='2', regex=True)
 
     if not(sample_data['title'].isna().any()):
         sample_data['title'] = sample_data['title'].str.lower()
@@ -43,62 +41,69 @@ def chunk_preprocessing(sample_data):
         sample_data['summary'] = sample_data['summary'].str.lower() 
         
           
-
-    
+    """
+    skip the row if id is not an int
+    this occured at one point
+    """          
     bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
     if (bol == False):
         return None
-    """commas, + is probably not necessary"""
-    sample_data['content'].replace(to_replace=r'[,]+', value='s', regex=True, inplace=True)
+
+
+
+    """commas"""
+    sample_data['content'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
 
     """whitespaces and tabs"""
-    sample_data['content'].replace(to_replace=r'[ \t]{2,}', value='s', regex=True, inplace=True) 
+    sample_data['content'].replace(to_replace=r'[ \t]{2,}', value='', regex=True, inplace=True) 
     
     """newline"""
-    sample_data['content'].replace(to_replace=r'[\n]+', value='s', regex=True, inplace=True)
+    sample_data['content'].replace(to_replace=r'[\n]+', value='', regex=True, inplace=True)
     
 
-    sample_data['title'].replace(to_replace=r'[,]+', value='s', regex=True, inplace=True)
-    sample_data['title'].replace(to_replace=r'[ \t]{2,}', value='s', regex=True, inplace=True) #whitespaces and tabs
-    sample_data['title'].replace(to_replace=r'[\n]+', value='s', regex=True, inplace=True) #newline
+    sample_data['title'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
+    sample_data['title'].replace(to_replace=r'[ \t]{2,}', value='', regex=True, inplace=True) #whitespaces and tabs
+    sample_data['title'].replace(to_replace=r'[\n]+', value='', regex=True, inplace=True) #newline
 
-    sample_data['summary'].replace(to_replace=r'[,]+', value='s', regex=True, inplace=True)
-    sample_data['summary'].replace(to_replace=r'[ \t]{2,}', value='s', regex=True, inplace=True) #whitespaces and tabs
-    sample_data['summary'].replace(to_replace=r'[\n]+', value='s', regex=True, inplace=True) #newline
+    sample_data['summary'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
+    sample_data['summary'].replace(to_replace=r'[ \t]{2,}', value='', regex=True, inplace=True) #whitespaces and tabs
+    sample_data['summary'].replace(to_replace=r'[\n]+', value='', regex=True, inplace=True) #newline
 
-    sample_data['meta_description'].replace(to_replace=r'[,]+', value='s', regex=True, inplace=True)
-    sample_data['meta_description'].replace(to_replace=r'[ \t]{2,}', value='s', regex=True, inplace=True) #whitespaces and tabs
-    sample_data['meta_description'].replace(to_replace=r'[\n]+', value='s', regex=True, inplace=True) #newline
+    sample_data['meta_description'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
+    sample_data['meta_description'].replace(to_replace=r'[ \t]{2,}', value='', regex=True, inplace=True) #whitespaces and tabs
+    sample_data['meta_description'].replace(to_replace=r'[\n]+', value='', regex=True, inplace=True) #newline
 
     """detects \. because it is needed to detect EOF in CSV. the extra backslashes are needed
     for escaping purposes"""
-    sample_data['content'].replace(to_replace=r'(\\\.)', value='s', regex=True, inplace=True) 
+    sample_data['content'].replace(to_replace=r'(\\\.)', value='', regex=True, inplace=True) 
  
 
-    sample_data['title'].replace(to_replace=r'(\\\.)', value='s', regex=True, inplace=True)
+    sample_data['title'].replace(to_replace=r'(\\\.)', value='', regex=True, inplace=True)
 
 
-    sample_data['summary'].replace(to_replace=r'(\\\.)', value='s', regex=True, inplace=True)
+    sample_data['summary'].replace(to_replace=r'(\\\.)', value='', regex=True, inplace=True)
 
 
-    sample_data['meta_description'].replace(to_replace=r'(\\\.)', value='s', regex=True, inplace=True)
+    sample_data['meta_description'].replace(to_replace=r'(\\\.)', value='', regex=True, inplace=True)
 
 
     """detects \ because it is needed to detect EOF in CSV. the extra backslashes are needed
     for escaping purposes"""
-    sample_data['content'].replace(to_replace=r'(\\)', value='s', regex=True, inplace=True)
+    sample_data['content'].replace(to_replace=r'(\\)', value='', regex=True, inplace=True)
  
  
 
-    sample_data['title'].replace(to_replace=r'(\\)', value='s', regex=True, inplace=True)
+    sample_data['title'].replace(to_replace=r'(\\)', value='', regex=True, inplace=True)
 
 
-    sample_data['summary'].replace(to_replace=r'(\\)', value='s', regex=True, inplace=True)
+    sample_data['summary'].replace(to_replace=r'(\\)', value='', regex=True, inplace=True)
 
 
-    sample_data['meta_description'].replace(to_replace=r'(\\)', value='s', regex=True, inplace=True)
+    sample_data['meta_description'].replace(to_replace=r'(\\)', value='', regex=True, inplace=True)
 
-
+    """
+    Dates regex from project related exercises
+    """
     sample_data['content'].replace(to_replace=days+months+year+r'(?=\D|$)', value='<DATE>', regex=True, inplace=True)
 
     sample_data['content'].replace(to_replace=months+days+year+r'(?=\D|$)', value='<DATE>', regex=True, inplace=True)
@@ -109,6 +114,9 @@ def chunk_preprocessing(sample_data):
 
     sample_data['summary'].replace(to_replace=months+days+year+r'(?=\D|$)', value='<DATE>', regex=True, inplace=True)
 
+    """
+    emails, numbers and urls regex
+    """
     sample_data['content'].replace(to_replace=r'\S+@\S+', value='<EMAIL>', regex=True, inplace=True)
 
     sample_data['summary'].replace(to_replace=r'[0-9]+', value='<NUM>', regex=True, inplace=True)
@@ -128,10 +136,13 @@ def chunk_preprocessing(sample_data):
     return sample_data 
 
 chunk_list = []
+"""
+chunksize of 2000 was optimal for my system
+"""
 chunksize = 2000
 
 col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
-df_chunk = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=col_names, low_memory=True, nrows=200000)
+df_chunk = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=col_names, low_memory=True)
 
 array = []
 months = r'\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may(?:ch)?|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|sept(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:[.,]?) '
@@ -150,6 +161,9 @@ for chunk in df_chunk:
  
     i=i+1
 
+    """
+    print progress
+    """
     if i % 2 == 0:
         print(i)
 
@@ -164,11 +178,12 @@ df = pd.concat(chunk_list)
 print("one")
 
 """ speeds up runtime of the program. 
-Could give errors! """
+Could give errors!(strikethrough) """
 df['inserted_at'] = df['inserted_at'].astype(str) 
 df['scraped_at'] = df['scraped_at'].astype(str) 
 df['updated_at'] = df['updated_at'].astype(str) 
 
+""" extracts columns """
 dfs = [
     df['content'],
     df['title'],
@@ -180,14 +195,22 @@ dfs = [
     ]
 
 print("two")
+"""
+nifty function to join all dfs
+"""
 val = df['id'].to_frame().join(dfs)
 
 print("three")
+"""
+save final df in csv
+"""
 val.to_csv('yolo.csv', index=False, header=False)
-
 
 # # CSV is opened so it can be copied
 print("four")
+"""
+open it here for use in the copy_from function below
+"""
 f = open('yolo.csv', encoding="utf8")
 
 print("five")
