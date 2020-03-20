@@ -1,11 +1,3 @@
-
-"""
-(a) For each table, devise a script employing the text cleaning library to clean the data
-(you can re-use the code/data from the earlier exercise) and
-extract the data corresponding to the table from the cleaned dataset into a CSV file;
-
-(b)  Load the CSV file into the corresponding database table by using PostgreSQL’s COPY command.
-"""
 import pandas as pd
 import numpy as np
 from cleantext import clean
@@ -15,12 +7,72 @@ import re
 import csv
 import psycopg2
 
+
+print("File: popauthors.py")
+
 # load data
-sample_data = pd.read_csv("1mio-raw.csv", usecols = ['authors'])
+# note that this returns a TextFileReader object, not a dataframe. 
+# Iterating over it, will yield dataframes. By using chunksizes, we'll
+# refer to the dataframes as chunks (valid point?)
+reader = pd.read_csv(
+    "1mio-raw.csv", 
+    usecols = ['authors'],
+    low_memory = True,
+    chunksize = 2000,
+    # if we use low_memory=True, we should aim to tell pandas 
+    # what the type of the columns should be, to avoid mixed type inference. 
+    # in this case, it's probably trivial, as we're only using the authors column.
+    dtype = {'authors': str}
+    )
 
-# we clean the data by
-# keeping only the first name and discarding the rest
 
+def process_dfs(readerObj):
+    firstFrame = next(reader)
+    firstFrame.drop_duplicates(inplace=True)
+    done_looping = False
+    print("START iteration over reader-object")
+    i = 0
+    while not done_looping:
+        try:
+            df = next(readerObj)
+        except StopIteration:
+            print("STOP iteration over reader-object")
+            done_looping = True
+        else:
+            df.drop_duplicates(inplace = True)
+            firstFrame = firstFrame.append(df)
+            print(i*2000/1000000*100, "%")
+            i += 1
+
+    return firstFrame
+
+complete_df = process_dfs(reader)
+
+complete_df.to_csv('author_clean.csv', index=False, header=False, sep=",")
+
+f = open('author_clean.csv', encoding="utf8")
+
+conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
+cur = conn.cursor() 
+cur.copy_from(f, 'author', sep=',')
+conn.commit()
+cur.close()
+
+
+
+
+"""
+# for DataFrame in TextFileReader object
+# for chunk in reader
+for df in tfReader:
+    df.drop_duplicates(inplace=True) # keep='first' is default
+    df_list.append(df)
+"""
+
+
+
+
+"""
 for i in range(len(sample_data)):
     dirty_authors = sample_data.at[i, 'authors']
 
@@ -39,6 +91,7 @@ for i in range(len(sample_data)):
 
 
 
+
 # cleaned data is converted to CSV
 sample_data.to_csv('authors.csv', index=True, header=False)
 
@@ -51,3 +104,4 @@ cur = conn.cursor()
 cur.copy_from(f, 'author', sep=',')
 conn.commit()
 cur.close()
+"""
