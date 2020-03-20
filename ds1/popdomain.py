@@ -16,13 +16,18 @@ import csv
 import psycopg2
 import math
 
+var = 'NULL'
 # load data
 sample_data = pd.read_csv("1mio-raw.csv", usecols = ['domain'])
 
-sample_data_cleaned = sample_data.replace(np.nan, '<NULL>', regex=True)
+# sample_data_cleaned = sample_data.replace(np.nan, None, regex=True)
+sample_data = sample_data.replace(np.nan, var, regex=True)
+
 
 # 
-sample_data_cleaned.to_csv('domain.csv', index=True, header=False)
+# sample_data.drop(sample_data.index[[116454]], inplace=True)
+sample_data.to_csv('domain.csv', index=True, header=False)
+
 
 # CSV is opened so it can be copied
 f = open('domain.csv', encoding="utf8")

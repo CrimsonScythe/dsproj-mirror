@@ -16,15 +16,18 @@ import csv
 import psycopg2
 import math
 
+var = 'NULL'
+
 # load data
-sample_data = pd.read_csv("1mio-raw.csv", usecols = ['keywords'])
+sample_data = pd.read_csv("1mio-raw.csv", usecols = ['id', 'keywords'], nrows=100000)
 
-sample_data_cleaned = sample_data.replace(np.nan, '<NULL>', regex=True)
+# sample_data_cleaned = sample_data.replace(np.nan, '<NULL>', regex=True)
 
+sample_data = sample_data.replace(np.nan, var, regex=True)
 
 # cleaned data is converted to CSV
 # 
-sample_data_cleaned.to_csv('keywords.csv', index=True, header=False)
+sample_data.to_csv('keywords.csv', index=False, header=False)
 
 # CSV is opened so it can be copied
 f = open('keywords.csv', encoding="utf8")
