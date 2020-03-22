@@ -1,3 +1,11 @@
+
+"""
+(a) For each table, devise a script employing the text cleaning library to clean the data
+(you can re-use the code/data from the earlier exercise) and
+extract the data corresponding to the table from the cleaned dataset into a CSV file;
+
+(b)  Load the CSV file into the corresponding database table by using PostgreSQL’s COPY command.
+"""
 import pandas as pd
 import numpy as np
 from cleantext import clean
@@ -6,97 +14,92 @@ import datefinder
 import re
 import csv
 import psycopg2
+import math
 
-
-print("File: popauthors.py")
-
+var = 'NULL'
 # load data
-# note that this returns a TextFileReader object, not a dataframe. 
-# Iterating over it, will yield dataframes. By using chunksizes, we'll
-# refer to the dataframes as chunks (valid point?)
-reader = pd.read_csv(
-    "1mio-raw.csv", 
-    usecols = ['authors'],
-    low_memory = True,
-    chunksize = 2000,
-    # if we use low_memory=True, we should aim to tell pandas 
-    # what the type of the columns should be, to avoid mixed type inference. 
-    # in this case, it's probably trivial, as we're only using the authors column.
-    dtype = {'authors': str}
-    )
 
+def chunk_preprocessing(sample_data):
+          
+    """
+    skip the row if id is not an int
+    this occured at one point
+    """          
+    bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
+    if (bol == False):
+        return None
 
-def process_dfs(readerObj):
-    firstFrame = next(reader)
-    firstFrame.drop_duplicates(inplace=True)
-    done_looping = False
-    print("START iteration over reader-object")
-    i = 0
-    while not done_looping:
-        try:
-            df = next(readerObj)
-        except StopIteration:
-            print("STOP iteration over reader-object")
-            done_looping = True
-        else:
-            df.drop_duplicates(inplace = True)
-            firstFrame = firstFrame.append(df)
-            print(i*2000/1000000*100, "%")
-            i += 1
+    dirty_authors = sample_data['authors']
 
-    return firstFrame
-
-complete_df = process_dfs(reader)
-
-complete_df.to_csv('author_clean.csv', index=False, header=False, sep=",")
-
-f = open('author_clean.csv', encoding="utf8")
-
-conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
-cur = conn.cursor() 
-cur.copy_from(f, 'author', sep=',')
-conn.commit()
-cur.close()
-
-
-
-
-"""
-# for DataFrame in TextFileReader object
-# for chunk in reader
-for df in tfReader:
-    df.drop_duplicates(inplace=True) # keep='first' is default
-    df_list.append(df)
-"""
-
-
-
-
-"""
-for i in range(len(sample_data)):
-    dirty_authors = sample_data.at[i, 'authors']
-
-    if pd.isnull(dirty_authors):
+    # if pd.isnull(dirty_authors):
         # print(dirty_authors)
-        sample_data.at[i, 'authors'] = '<NULL>'
+        # sample_data.at['authors'] = '<NULL>'
 
-    if not pd.isnull(dirty_authors):
-        if ("," in dirty_authors):
-            splitted = dirty_authors.split(',')    
-            sample_data.at[i, 'authors'] = splitted[0]
-        else :
-            if (dirty_authors.split() != 2):
-                sample_data.at[i, 'authors'] = dirty_authors.split()[0] 
-            # print(dirty_authors)
+    # print(dirty_authors)
+
+    # if not pd.isnull(dirty_authors.all()):
+    #     if ("," in dirty_authors):
+    #         splitted = dirty_authors.str.split(',')    
+    #         sample_data.at['authors'] = splitted[0]
+    #     else :
+    #         if (dirty_authors.split() != 2):
+    #             sample_data.at['authors'] = dirty_authors.split()[0]     
+
+    sample_data['authors'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
 
 
+    return sample_data    
+
+df_chunk = pd.read_csv("1mio-raw.csv", chunksize=2000, usecols = ['id', 'authors'])
+
+
+chunk_list = []
+"""
+chunksize of 2000 was optimal for my system
+"""
+# chunksize = 2000
+
+col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
+# df_chunk = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=col_names, low_memory=True)
+
+array = []
+
+col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
+
+for chunk in df_chunk:
+    
+    chunk_filter = chunk_preprocessing(chunk)
+
+    if (chunk_filter is None):
+        continue
+ 
+    # i=i+1
+
+    """
+    print progress
+    """
+    # if i % 2 == 0:
+        # print(i)
+
+    chunk_list.append(chunk_filter)
+    
+
+df = pd.concat(chunk_list)   
+
+
+# sample_data = sample_data.replace(np.nan, var, regex=True)
 
 
 # cleaned data is converted to CSV
-sample_data.to_csv('authors.csv', index=True, header=False)
+# 
+val = df['id'].to_frame().join(df['authors'])
+val.to_csv('author.csv', index=False, header=False)
+
+
+
 
 # CSV is opened so it can be copied
-f = open('authors.csv', encoding="utf8")
+f = open('author.csv', encoding="utf8")
 
 # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
@@ -104,4 +107,3 @@ cur = conn.cursor()
 cur.copy_from(f, 'author', sep=',')
 conn.commit()
 cur.close()
-"""
