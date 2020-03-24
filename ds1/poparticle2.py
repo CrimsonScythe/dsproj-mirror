@@ -49,8 +49,14 @@ def chunk_preprocessing(sample_data):
     if (bol == False):
         return None
 
+# string = string.replace(u'\xa0', u' ')
 
+    """for the xa0 byte, some encoding stuff which creates trouble"""
+    sample_data['meta_keywords'].replace(to_replace=r'\\xa0', value=' ', regex=True, inplace=True)
 
+    sample_data['meta_keywords'].replace(to_replace=r'[\'\']', value='', regex=True, inplace=True)
+
+    sample_data['meta_keywords'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
     """commas"""
     sample_data['content'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
 
@@ -189,6 +195,7 @@ dfs = [
     df['title'],
     df['summary'], 
     df['meta_description'],
+    df['meta_keywords'],
     df['inserted_at'],
     df['scraped_at'],
     df['updated_at']
@@ -217,7 +224,7 @@ print("five")
 # # # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor() 
-cur.copy_from(f, 'article', columns=('article_id', 'content', 'title', 'summary', 'meta_description', 'inserted_at',
+cur.copy_from(f, 'article', columns=('article_id', 'content', 'title', 'summary', 'meta_description', 'meta_keywords', 'inserted_at',
 'scraped_at', 'updated_at'), sep=',')
 conn.commit()
 cur.close()

@@ -40,6 +40,7 @@ for o in domains:
 
 conn.commit()
 cur.close()
+
             # print(p[0])
 
             # print(o[0])

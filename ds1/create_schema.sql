@@ -37,6 +37,7 @@ CREATE TABLE Article (
   content text,
   summary text,
   meta_description text,
+  meta_keyword
   type_id integer REFERENCES Type(type_id),
   inserted_at timestamp,
   updated_at timestamp,
