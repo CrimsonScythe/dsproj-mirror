@@ -28,7 +28,7 @@ CREATE TABLE Domain (
 
 CREATE TABLE Article_type (
   type_id serial,
-  type_name varchar(64),
+  type_name varchar,
   PRIMARY KEY (type_id)
 );
 

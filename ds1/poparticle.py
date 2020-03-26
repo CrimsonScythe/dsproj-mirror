@@ -16,8 +16,6 @@ cleans data for article
 and copies the data to local db
 """
 
-authors_list = []
-
 def chunk_preprocessing(sample_data):
 
     """
@@ -51,7 +49,7 @@ def chunk_preprocessing(sample_data):
     if (bol == False):
         return None
 
-    # string = string.replace(u'\xa0', u' ')
+# string = string.replace(u'\xa0', u' ')
 
     """for the xa0 byte, some encoding stuff which creates trouble"""
     sample_data['meta_keywords'].replace(to_replace=r'\\xa0', value=' ', regex=True, inplace=True)
@@ -139,6 +137,8 @@ def chunk_preprocessing(sample_data):
     
     sample_data['content'].replace(to_replace=r'(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)', value='<URL>', regex=True, inplace=True)
     
+
+
     return sample_data 
 
 chunk_list = []
@@ -188,9 +188,10 @@ df['updated_at'] = df['updated_at'].astype(str)
 
 """ extracts columns """
 dfs = [
-    df['content'],
     df['title'],
+    df['content'],
     df['summary'], 
+    df['written_by']
     df['meta_description'],
     df['meta_keywords'],
     df['inserted_at'],
