@@ -6,11 +6,13 @@ import datefinder
 import re
 import psycopg2
 
+##### VIRKER IKKE.
+
 # sample_data = pd.read_csv("1mio-raw.csv", dtype={'id': int, 'domain': object, 'type': object, 'url': object, 'content': object,
 # 'scraped_at': object, 'inserted_at': object, 'updated_at': object, 'title': object, 'authors': object, 'keywords': object, 'meta_description': object,
 # 'tags': object, 'summary': object})
 
-sample_data = pd.read_csv("news_sample.csv")
+sample_data = pd.read_csv("1mio-raw.csv")
 
 sample_data['summary'] = sample_data['summary'].to_frame().replace(np.nan, '<NULL>', regex=True)
 sample_data['summary'] = sample_data['summary'].to_frame().replace('[,]', '\,', regex=True)

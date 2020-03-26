@@ -1,31 +1,32 @@
-DROP TABLE Written_by;
-DROP TABLE Tags;
-DROP TABLE Webpage;
-DROP TABLE Article CASCADE;
-DROP TABLE Type;
-DROP TABLE Domain;
-DROP TABLE Author;
-DROP TABLE Keyword;
+DROP TABLE IF EXISTS Written_by CASCADE;
+DROP TABLE IF EXISTS Tags CASCADE;
+DROP TABLE IF EXISTS Webpage CASCADE;
+DROP TABLE IF EXISTS Article CASCADE;
+DROP TABLE IF EXISTS Article_type;
+DROP TABLE IF EXISTS Type CASCADE;
+DROP TABLE IF EXISTS Domain CASCADE;
+DROP TABLE IF EXISTS Author CASCADE;
+DROP TABLE IF EXISTS Keyword CASCADE;
 
 CREATE TABLE Keyword (
   keyword_id serial,
-  keyword varchar(128),
+  keyword varchar,
   PRIMARY KEY (keyword_id)
 );
 
 CREATE TABLE Author (
   author_id serial,
-  author_name varchar(64),
+  author_name varchar,
   PRIMARY KEY (author_id)
 );
 
 CREATE TABLE Domain (
   domain_id serial,
-  domain_url varchar(1024),
+  domain_url varchar,
   PRIMARY KEY (domain_id)
 );
 
-CREATE TABLE Type (
+CREATE TABLE Article_type (
   type_id serial,
   type_name varchar(64),
   PRIMARY KEY (type_id)
@@ -33,12 +34,12 @@ CREATE TABLE Type (
 
 CREATE TABLE Article (
   article_id integer,
-  title varchar (512),
+  title varchar,
   content text,
   summary text,
   meta_description text,
-  meta_keyword
-  type_id integer REFERENCES Type(type_id),
+  meta_keyword text,
+  type_id integer REFERENCES Article_type(type_id),
   inserted_at timestamp,
   updated_at timestamp,
   scraped_at timestamp,
@@ -46,7 +47,7 @@ CREATE TABLE Article (
 );
 
 CREATE TABLE Webpage (
-  url varchar(1024),
+  url varchar,
   article_id integer REFERENCES Article(article_id),
   domain_id integer REFERENCES Domain(domain_id)
 );
