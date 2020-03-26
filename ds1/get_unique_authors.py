@@ -11,36 +11,27 @@ from io import StringIO
 
 def get_authors_dict():
 
-	authors_list = []
-	chunksize = 2000
+	authors_lists = []
 
-	df_reader = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=['authors'], low_memory=True)
+	df = pd.read_csv("1mio-raw.csv", usecols=['authors'], low_memory=True)
 
+	unique_authors_list = df['authors'].unique()
+
+	num_of_authors = len(unique_authors_list)
+
+	authors_dict = {}
 	i = 0
-	for df in df_reader:
-		authors_list.append(df['authors'].to_list())
-
-		print(i * chunksize / 1000000 * 100)
-		i += 1
-
-
-	authors_list_unique = []
-
-	for author in authors_list:
-		if author not in authors_list_unique:
-			authors_list_unique.append(author)
-
-	i = 0
-	author_dict = {}
-
-	for author in authors_list_unique:
-		if not author_dict[author]:
-			author_dict[author] = i
+	prog = 0
+	for author in unique_authors_list:
+		try: 
+			authors_dict[author]
 			i += 1
+		except KeyError:
+			authors_dict[author] = i
+			i += 1
+		
+		print(prog / num_of_authors * 100, "%")
+		prog += 1
 
-	print(author_dict['Sean Martin'])
-
-
-get_authors_dict()
-
+	return authors_dict
 

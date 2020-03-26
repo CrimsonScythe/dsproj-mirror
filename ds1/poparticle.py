@@ -8,6 +8,7 @@ import psycopg2
 import time
 import math
 from io import StringIO
+from get_unique_authors import get_authors_dict
 
 i=0
 
@@ -15,6 +16,8 @@ i=0
 cleans data for article
 and copies the data to local db
 """
+
+authors_dict = get_authors_dict()
 
 def chunk_preprocessing(sample_data):
 
@@ -137,7 +140,7 @@ def chunk_preprocessing(sample_data):
     
     sample_data['content'].replace(to_replace=r'(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)', value='<URL>', regex=True, inplace=True)
     
-
+    sample_data['authors'].replace(to_replace=authors_dict, value=None, regex=False, inplace=True)
 
     return sample_data 
 
@@ -191,7 +194,7 @@ dfs = [
     df['title'],
     df['content'],
     df['summary'], 
-    df['written_by']
+    df['authors'],
     df['meta_description'],
     df['meta_keywords'],
     df['inserted_at'],
@@ -222,7 +225,7 @@ print("five")
 # # # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor() 
-cur.copy_from(f, 'article', columns=('article_id', 'content', 'title', 'summary', 'meta_description', 'meta_keywords', 'inserted_at',
+cur.copy_from(f, 'article', columns=('article_id', 'content', 'title','summary', 'authors', 'meta_description', 'meta_keywords', 'inserted_at',
 'scraped_at', 'updated_at'), sep=',')
 conn.commit()
 cur.close()
