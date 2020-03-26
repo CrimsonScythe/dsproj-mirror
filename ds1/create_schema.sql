@@ -37,9 +37,10 @@ CREATE TABLE Article (
   title varchar,
   content text,
   summary text,
-  meta_description text,
-  meta_keyword text,
+  written_by text,
   type_id integer REFERENCES Article_type(type_id),
+  meta_description text,
+  meta_keywords text,
   inserted_at timestamp,
   updated_at timestamp,
   scraped_at timestamp,
@@ -57,7 +58,11 @@ CREATE TABLE Tags (
   keyword_id integer REFERENCES Keyword(keyword_id)
 );
 
-CREATE TABLE Written_by (
-  article_id integer REFERENCES Article(article_id),
-  author_id integer REFERENCES Author(author_id)
-);
+
+-- Made part of Article instead
+--CREATE TABLE Written_by (
+--article_id integer REFERENCES Article(article_id),
+--author_id integer REFERENCES Author(author_id)
+--);
+
+

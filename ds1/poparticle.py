@@ -16,6 +16,8 @@ cleans data for article
 and copies the data to local db
 """
 
+authors_list = []
+
 def chunk_preprocessing(sample_data):
 
     """
@@ -49,7 +51,7 @@ def chunk_preprocessing(sample_data):
     if (bol == False):
         return None
 
-# string = string.replace(u'\xa0', u' ')
+    # string = string.replace(u'\xa0', u' ')
 
     """for the xa0 byte, some encoding stuff which creates trouble"""
     sample_data['meta_keywords'].replace(to_replace=r'\\xa0', value=' ', regex=True, inplace=True)
@@ -137,8 +139,6 @@ def chunk_preprocessing(sample_data):
     
     sample_data['content'].replace(to_replace=r'(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)', value='<URL>', regex=True, inplace=True)
     
-
-
     return sample_data 
 
 chunk_list = []
@@ -150,13 +150,10 @@ chunksize = 2000
 col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
 df_chunk = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=col_names, low_memory=True)
 
-array = []
 months = r'\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may(?:ch)?|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|sept(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:[.,]?) '
 days = r'(?:[0-31]\d[,.]?) '
 year = r'?(?:19[7-9]\d|2\d{3})? '
 white_space = r'^\s*$'
-
-col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
 
 for chunk in df_chunk:
     
