@@ -140,7 +140,9 @@ def chunk_preprocessing(sample_data):
     
     sample_data['content'].replace(to_replace=r'(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)', value='<URL>', regex=True, inplace=True)
     
-    sample_data['authors'].replace(to_replace=authors_dict, value=None, regex=False, inplace=True)
+    sample_data['authors'] = sample_data['authors'].map(authors_dict)
+
+    print(sample_data['authors'])
 
     return sample_data 
 
@@ -170,8 +172,8 @@ for chunk in df_chunk:
     """
     print progress
     """
-    if i % 2 == 0:
-        print(i)
+
+    print(i * chunksize / 1000000 * 100, "%")
 
     chunk_list.append(chunk_filter)
     
