@@ -3,7 +3,7 @@ WITH res AS (SELECT article_id FROM article INNER JOIN article_type ON
 article.article_id=article_type.type_id
 WHERE type_name='reliable' AND scraped_at>='2018-01-15 00:00:00.000000'::date)
 SELECT domain.domain_url FROM domain INNER JOIN res ON
-res.article_id=domain.domain_id
+res.article_id=domain.domain_id;
 -- 2.
 SELECT COUNT(author_name), author_name FROM author INNER JOIN article_type ON
 author.author_id=article_type.type_id WHERE 

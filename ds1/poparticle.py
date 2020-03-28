@@ -8,6 +8,7 @@ import psycopg2
 import time
 import math
 from io import StringIO
+from get_unique_authors import get_authors_dict
 
 i=0
 
@@ -15,6 +16,8 @@ i=0
 cleans data for article
 and copies the data to local db
 """
+
+authors_dict = get_authors_dict()
 
 def chunk_preprocessing(sample_data):
 
@@ -138,7 +141,9 @@ def chunk_preprocessing(sample_data):
     
     sample_data['content'].replace(to_replace=r'(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)', value='<URL>', regex=True, inplace=True)
     
+    sample_data['authors'] = sample_data['authors'].map(authors_dict)
 
+    print(sample_data['authors'])
 
     return sample_data 
 
@@ -151,13 +156,10 @@ chunksize = 2000
 col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
 df_chunk = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=col_names, low_memory=True)
 
-array = []
 months = r'\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may(?:ch)?|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|sept(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:[.,]?) '
 days = r'(?:[0-31]\d[,.]?) '
 year = r'?(?:19[7-9]\d|2\d{3})? '
 white_space = r'^\s*$'
-
-col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
 
 for chunk in df_chunk:
     
@@ -171,8 +173,8 @@ for chunk in df_chunk:
     """
     print progress
     """
-    if i % 2 == 0:
-        print(i)
+
+    print(i * chunksize / 1000000 * 100, "%")
 
     chunk_list.append(chunk_filter)
     
@@ -192,9 +194,10 @@ df['updated_at'] = df['updated_at'].astype(str)
 
 """ extracts columns """
 dfs = [
-    df['content'],
     df['title'],
+    df['content'],
     df['summary'], 
+    df['authors'],
     df['meta_description'],
     df['meta_keywords'],
     df['inserted_at'],
@@ -225,7 +228,7 @@ print("five")
 # # # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor() 
-cur.copy_from(f, 'article', columns=('article_id', 'content', 'title', 'summary', 'meta_description', 'meta_keywords', 'inserted_at',
+cur.copy_from(f, 'article', columns=('article_id', 'content', 'title','summary', 'authors', 'meta_description', 'meta_keywords', 'inserted_at',
 'scraped_at', 'updated_at'), sep=',')
 conn.commit()
 cur.close()
