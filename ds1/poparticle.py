@@ -52,9 +52,10 @@ def chunk_preprocessing(sample_data):
 # string = string.replace(u'\xa0', u' ')
 
     """for the xa0 byte, some encoding stuff which creates trouble"""
-    sample_data['meta_keywords'].replace(to_replace=r'\\xa0', value=' ', regex=True, inplace=True)
+ 
+    sample_data['meta_keywords'].replace(to_replace=r'\\xa0', value='NULL', regex=True, inplace=True)
 
-    sample_data['meta_keywords'].replace(to_replace=r'[\'\']', value='', regex=True, inplace=True)
+    sample_data['meta_keywords'].replace(to_replace=r'\[\'\'\]', value='NULL', regex=True, inplace=True)
 
     sample_data['meta_keywords'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
     """commas"""

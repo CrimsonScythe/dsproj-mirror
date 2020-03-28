@@ -25,13 +25,26 @@ def chunk_preprocessing(sample_data):
     skip the row if id is not an int
     this occured at one point
     """          
-    bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
-    if (bol == False):
-        return None
+    # bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
+    # if (bol == False):
+        # return None
+
+    if not(sample_data['meta_keywords'].isna().any()):
+        sample_data['meta_keywords'] = sample_data['meta_keywords'].str.lower()
+  
+
+    sample_data['meta_keywords'].replace(to_replace=r'\\xa0', value='NULL', regex=True, inplace=True)
+
+    sample_data['meta_keywords'].replace(to_replace=r'\[\'\'\]', value='NULL', regex=True, inplace=True)
+
+    sample_data['meta_keywords'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
+
+
+    # First we replace any weird entries with 'NULL' and to save headaches later on when querying, we skip over the nulls so our db doesnt contain any nulls at all. 
 
     return sample_data    
 
-df_chunk = pd.read_csv("1mio-raw.csv", chunksize=2000, usecols = ['id', 'keywords'])
+df_chunk = pd.read_csv("1mio-raw.csv", chunksize=2000, usecols = ['meta_keywords'])
 
 
 chunk_list = []
@@ -67,20 +80,15 @@ for chunk in df_chunk:
 
 df = pd.concat(chunk_list)   
 
+df.drop_duplicates(subset=['meta_keywords'], keep='first', inplace=True)
 
-# sample_data = sample_data.replace(np.nan, var, regex=True)
-
-
-# cleaned data is converted to CSV
-# 
-val = df['id'].to_frame().join(df['keywords'])
-val.to_csv('type.csv', index=False, header=False)
+df.to_csv('keywords.csv', index=True, header=False)
 
 
 
 
 # CSV is opened so it can be copied
-f = open('type.csv', encoding="utf8")
+f = open('keywords.csv', encoding="utf8")
 
 # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
