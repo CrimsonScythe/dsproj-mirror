@@ -70,9 +70,4 @@ CREATE TABLE is_type (
    type_id integer REFERENCES Type(type_id)
 );
 
-CREATE TABLE Type (
-   type_id serial,
-   name varchar,
-   PRIMARY KEY (type_id)
-);
 
