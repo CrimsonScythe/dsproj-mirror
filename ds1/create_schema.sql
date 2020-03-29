@@ -65,4 +65,14 @@ CREATE TABLE Tags (
 --author_id integer REFERENCES Author(author_id)
 --);
 
+CREATE TABLE is_type (
+   article_id integer REFERENCES Article(article_id),
+   type_id integer REFERENCES Type(type_id)
+);
+
+CREATE TABLE Type (
+   type_id serial,
+   name varchar,
+   PRIMARY KEY (type_id)
+);
 
