@@ -67,7 +67,7 @@ CREATE TABLE Tags (
 
 CREATE TABLE is_type (
    article_id integer REFERENCES Article(article_id),
-   type_id integer REFERENCES Type(type_id)
+   type_id integer REFERENCES article_type(type_id)
 );
 
 
