@@ -4,36 +4,116 @@ from cleantext import clean
 from datetime import datetime
 import datefinder
 import re
+import csv
 import psycopg2
 
-# sample_data = pd.read_csv("1mio-raw.csv", dtype={'id': int, 'domain': object, 'type': object, 'url': object, 'content': object,
-# 'scraped_at': object, 'inserted_at': object, 'updated_at': object, 'title': object, 'authors': object, 'keywords': object, 'meta_description': object,
-# 'tags': object, 'summary': object})
+
+"""
+(a) For each table, devise a script employing the text cleaning library to clean the data
+(you can re-use the code/data from the earlier exercise) and
+extract the data corresponding to the table from the cleaned dataset into a CSV file;
+
+(b)  Load the CSV file into the corresponding database table by using PostgreSQL’s COPY command.
+"""
+import pandas as pd
+import numpy as np
+from cleantext import clean
+from datetime import datetime
+import datefinder
+import re
+import csv
+import psycopg2
+import math
+
+i=0
+var = 'NULL'
+# load data
+
+def chunk_preprocessing(sample_data, dict):
+          
+    """
+    skip the row if id is not an int
+    this occured at one point
+    """          
+    bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
+    if (bol == False):
+        return None
+
+    # if (pd.isnull(sample_data['type'].all())):
+    #     return None
+
+    sample_data['url'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
+
+    
+
+    sample_data['domain'].replace(dict, inplace=True)
+
+    # for index, row in sample_data.iterrows():
+    #     if (pd.isnull(row['type'])):
+    #         continue
+    #     row['type'] = dict[row['type']]
+        # print(row['id'], row['type'])
+
+    # print(sample_data)
+    
+
+    return sample_data    
+
+conn1 = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
+cur1 = conn1.cursor() 
+cur1.execute('SELECT * FROM domain;')
+types = cur1.fetchall()
+temp_dict = dict(types)
+# swap keys and values
+my_dict = dict((v,k) for k,v in temp_dict.items())
 
 
-sample_data = pd.read_csv("news_sample.csv")
 
-sample_data['summary'] = sample_data['summary'].to_frame().replace(np.nan, '<NULL>', regex=True)
-sample_data['summary'] = sample_data['summary'].to_frame().replace('[,]', '\,', regex=True)
-sample_data['meta_description'] = sample_data['meta_description'].to_frame().replace(np.nan, '<NULL>', regex=True)
-sample_data['meta_description'] = sample_data['meta_description'].to_frame().replace('[,]', '\,', regex=True)
+df_chunk = pd.read_csv("1mio-raw.csv", chunksize=2000, usecols = ['id', 'url', 'domain'])
 
-# sample_data['url'].to_frame().to_csv('web.csv', index=True, header=False)
-val = sample_data['url'].to_frame().join(sample_data['id'].to_frame())
 
-# val = sample_data['id'].to_frame().join(dfs)
-val.to_csv('web.csv', index=True, header=False)
+chunk_list = []
+"""
+chunksize of 2000 was optimal for my system
+"""
+# chunksize = 2000
 
-# sample_data['content'].to_csv('articlecontent.csv', index=False, header=True)
+col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
+# df_chunk = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=col_names, low_memory=True)
 
-# print(val)
+array = []
 
+col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
+
+for chunk in df_chunk:
+    
+    chunk_filter = chunk_preprocessing(chunk, my_dict)
+
+    if (chunk_filter is None):
+        continue
+    
+    i=i+1
+    
+    # if i % 2 == 0:
+        # print(i)
+
+    chunk_list.append(chunk_filter)
+    
+
+df = pd.concat(chunk_list)   
+# df['type'] = df['type'].fillna(397)
+# df['type'] = df['type'].astype(int)
+df.to_csv('web.csv', index=False, header=False)
+
+
+print('5')
 # CSV is opened so it can be copied
 f = open('web.csv', encoding="utf8")
 
 # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor() 
-cur.copy_from(f, 'webpage', columns=('domain_id','url', 'article_id'), sep=',')
+cur.copy_from(f, 'webpage', sep=',')
 conn.commit()
 cur.close()
+# columns=('article_id', 'domain_id', 'url'),

@@ -48,9 +48,9 @@ CREATE TABLE Article (
 );
 
 CREATE TABLE Webpage (
-  url varchar,
   article_id integer REFERENCES Article(article_id),
-  domain_id integer REFERENCES Domain(domain_id)
+  domain_id integer REFERENCES Domain(domain_id),
+  url text
 );
 
 CREATE TABLE Tags (
