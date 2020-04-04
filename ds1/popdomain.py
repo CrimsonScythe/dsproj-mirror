@@ -25,13 +25,17 @@ def chunk_preprocessing(sample_data):
     skip the row if id is not an int
     this occured at one point
     """          
-    bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
-    if (bol == False):
-        return None
+    # bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
+    # if (bol == False):
+        # return None
+
+    # First we replace any weird entries with 'NULL' and to save headaches later on when querying, we skip over the nulls so our db doesnt contain any nulls at all. 
+
+    sample_data['domain'].replace(to_replace=np.nan, value='NULL', regex=True, inplace=True)
 
     return sample_data    
 
-df_chunk = pd.read_csv("1mio-raw.csv", chunksize=2000, usecols = ['id', 'domain'])
+df_chunk = pd.read_csv("1mio-raw.csv", chunksize=2000, usecols = ['domain'])
 
 
 chunk_list = []
@@ -67,15 +71,9 @@ for chunk in df_chunk:
 
 df = pd.concat(chunk_list)   
 
+df.drop_duplicates(subset=['domain'], keep='first', inplace=True)
 
-# sample_data = sample_data.replace(np.nan, var, regex=True)
-
-
-# cleaned data is converted to CSV
-# 
-val = df['id'].to_frame().join(df['domain'])
-val.to_csv('domain.csv', index=False, header=False)
-
+df.to_csv('domain.csv', index=True, header=False)
 
 
 
