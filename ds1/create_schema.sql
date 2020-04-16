@@ -1,13 +1,3 @@
-DROP TABLE IF EXISTS Written_by CASCADE;
-DROP TABLE IF EXISTS Tags CASCADE;
-DROP TABLE IF EXISTS Webpage CASCADE;
-DROP TABLE IF EXISTS Article CASCADE;
-DROP TABLE IF EXISTS Article_type;
-DROP TABLE IF EXISTS Type CASCADE;
-DROP TABLE IF EXISTS Domain CASCADE;
-DROP TABLE IF EXISTS Author CASCADE;
-DROP TABLE IF EXISTS Keyword CASCADE;
-
 CREATE TABLE Keyword (
   keyword_id serial,
   keyword varchar,
@@ -37,13 +27,13 @@ CREATE TABLE Article (
   title varchar,
   content text,
   summary text,
-  -- written_by text,
+  --written_by text,
   -- type_id integer REFERENCES Article_type(type_id),
   meta_description text,
-  --meta_keywords text,
   inserted_at timestamp,
   updated_at timestamp,
   scraped_at timestamp,
+  meta_keywords text,
   PRIMARY KEY (article_id)
 );
 
@@ -58,16 +48,7 @@ CREATE TABLE Tags (
   keyword_id integer REFERENCES Keyword(keyword_id)
 );
 
-
--- Made part of Article instead
---CREATE TABLE Written_by (
---article_id integer REFERENCES Article(article_id),
---author_id integer REFERENCES Author(author_id)
---);
-
 CREATE TABLE is_type (
    article_id integer REFERENCES Article(article_id),
    type_id integer REFERENCES article_type(type_id)
 );
-
-
