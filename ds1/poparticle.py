@@ -48,11 +48,11 @@ def chunk_preprocessing(sample_data):
     skip the row if id is not an int
     this occured at one point
     """          
-    bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
-    if (bol == False):
-        return None
 
-# string = string.replace(u'\xa0', u' ')
+    sample_data['id']=pd.to_numeric(sample_data['id'], errors='coerce')
+    
+    sample_data['id'] = sample_data['id'].astype('Int64')
+
 
     """for the xa0 byte, some encoding stuff which creates trouble"""
  
@@ -141,9 +141,11 @@ def chunk_preprocessing(sample_data):
     
     sample_data['content'].replace(to_replace=r'(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)', value='<URL>', regex=True, inplace=True)
     
-    sample_data['authors'] = sample_data['authors'].map(authors_dict)
+    # sample_data['authors'] = sample_data['authors'].map(authors_dict)
+    # print(sample_data['authors'])
 
-    print(sample_data['authors'])
+
+    sample_data = sample_data[sample_data['id'].notna()]
 
     return sample_data 
 
@@ -182,7 +184,6 @@ for chunk in df_chunk:
 df = pd.concat(chunk_list)    
 
 
-# print(df)
 
 print("one")
 
@@ -197,12 +198,11 @@ dfs = [
     df['title'],
     df['content'],
     df['summary'], 
-    df['authors'],
     df['meta_description'],
-    df['meta_keywords'],
     df['inserted_at'],
+    df['updated_at'],
     df['scraped_at'],
-    df['updated_at']
+    df['meta_keywords'],
     ]
 
 print("two")
@@ -228,7 +228,6 @@ print("five")
 # # # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor() 
-cur.copy_from(f, 'article', columns=('article_id', 'content', 'title','summary', 'authors', 'meta_description', 'meta_keywords', 'inserted_at',
-'scraped_at', 'updated_at'), sep=',')
+cur.copy_from(f, 'article', sep=',')
 conn.commit()
 cur.close()

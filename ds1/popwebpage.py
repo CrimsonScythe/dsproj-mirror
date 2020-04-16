@@ -6,56 +6,32 @@ import datefinder
 import re
 import csv
 import psycopg2
-
-
-"""
-(a) For each table, devise a script employing the text cleaning library to clean the data
-(you can re-use the code/data from the earlier exercise) and
-extract the data corresponding to the table from the cleaned dataset into a CSV file;
-
-(b)  Load the CSV file into the corresponding database table by using PostgreSQL’s COPY command.
-"""
-import pandas as pd
-import numpy as np
-from cleantext import clean
-from datetime import datetime
-import datefinder
-import re
-import csv
-import psycopg2
 import math
 
+
 i=0
-var = 'NULL'
-# load data
+
 
 def chunk_preprocessing(sample_data, dict):
-          
-    """
-    skip the row if id is not an int
-    this occured at one point
-    """          
-    bol=pd.to_numeric(sample_data['id'], errors='coerce').notnull().all()
-    if (bol == False):
-        return None
-
-    # if (pd.isnull(sample_data['type'].all())):
-    #     return None
+  
 
     sample_data['url'].replace(to_replace=r'[,]', value='', regex=True, inplace=True)
 
-    
 
     sample_data['domain'].replace(dict, inplace=True)
 
-    # for index, row in sample_data.iterrows():
-    #     if (pd.isnull(row['type'])):
-    #         continue
-    #     row['type'] = dict[row['type']]
-        # print(row['id'], row['type'])
+    """ force convert id to int, converting non numeric values to nan """
 
-    # print(sample_data)
+    sample_data['id']=pd.to_numeric(sample_data['id'], errors='coerce')
     
+    sample_data['id'] = sample_data['id'].astype('Int64')
+
+    sample_data['domain'] = sample_data['domain'].astype('Int64')
+    
+    """ leave out the nan value """
+
+    sample_data = sample_data[sample_data['id'].notna()]
+
 
     return sample_data    
 
@@ -68,22 +44,14 @@ temp_dict = dict(types)
 my_dict = dict((v,k) for k,v in temp_dict.items())
 
 
-
 df_chunk = pd.read_csv("1mio-raw.csv", chunksize=2000, usecols = ['id', 'url', 'domain'])
 
 
 chunk_list = []
-"""
-chunksize of 2000 was optimal for my system
-"""
-# chunksize = 2000
+
 
 col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
-# df_chunk = pd.read_csv("1mio-raw.csv", chunksize=chunksize, usecols=col_names, low_memory=True)
 
-array = []
-
-col_names =  ['id', 'domain', 'type', 'url', 'content', 'scraped_at', 'inserted_at', 'updated_at', 'title', 'authors', 'keywords', 'meta_keywords', 'meta_description', 'tags', 'summary']
 
 for chunk in df_chunk:
     
@@ -94,15 +62,13 @@ for chunk in df_chunk:
     
     i=i+1
     
-    # if i % 2 == 0:
-        # print(i)
+    if i % 2 == 0:
+        print(i)
 
     chunk_list.append(chunk_filter)
     
 
 df = pd.concat(chunk_list)   
-# df['type'] = df['type'].fillna(397)
-# df['type'] = df['type'].astype(int)
 df.to_csv('web.csv', index=False, header=False)
 
 
@@ -116,4 +82,3 @@ cur = conn.cursor()
 cur.copy_from(f, 'webpage', sep=',')
 conn.commit()
 cur.close()
-# columns=('article_id', 'domain_id', 'url'),
