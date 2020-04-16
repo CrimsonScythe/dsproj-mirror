@@ -33,7 +33,7 @@ CREATE TABLE Article (
   --written_by text,
   -- type_id integer REFERENCES Article_type(type_id),
   meta_description text,
-  meta_keywords text,
+  --meta_keywords text,
   inserted_at timestamp,
   updated_at timestamp,
   scraped_at timestamp,
