@@ -30,13 +30,13 @@ CREATE TABLE Article (
   title varchar,
   content text,
   summary text,
-  written_by text,
-  type_id integer REFERENCES Article_type(type_id),
+  --written_by text,
+  -- type_id integer REFERENCES Article_type(type_id),
   meta_description text,
-  meta_keywords text,
   inserted_at timestamp,
   updated_at timestamp,
   scraped_at timestamp,
+  meta_keywords text,
   PRIMARY KEY (article_id)
 );
 
@@ -54,6 +54,11 @@ CREATE TABLE Tags (
 CREATE TABLE is_type (
    article_id integer REFERENCES Article(article_id),
    type_id integer REFERENCES article_type(type_id)
+);
+
+CREATE TABLE written_by (
+  article_id integer REFERENCES Article(article_id),
+  author_id integer REFERENCES Author(author_id)
 );
 """
 
