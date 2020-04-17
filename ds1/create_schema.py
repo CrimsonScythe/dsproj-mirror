@@ -55,6 +55,11 @@ CREATE TABLE is_type (
    article_id integer REFERENCES Article(article_id),
    type_id integer REFERENCES article_type(type_id)
 );
+
+CREATE TABLE written_by (
+  article_id integer REFERENCES Article(article_id),
+  author_id integer REFERENCES Author(author_id)
+);
 """
 
 conn = psycopg2.connect(

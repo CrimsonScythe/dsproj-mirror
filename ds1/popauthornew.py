@@ -9,6 +9,13 @@ import psycopg2
 import math
 from get_unique_authors import get_authors_dict
 
+"""
+Current 'issues':
+- there are often a leading whitespace " " in front of author name. 
+-- problem is with get_unique.authors.py. Could be fixed by using 
+-- regex instead of split(",") and then not include leading whitespaces.
+"""
+
 authors_dict = get_authors_dict()
 
 col1_author_id = list(authors_dict.values())
