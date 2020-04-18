@@ -23,11 +23,28 @@ SELECT domain.domain_url FROM domain WHERE domain.domain_id IN
 
 
 -- 2.
-SELECT COUNT(author_name), author_name FROM author INNER JOIN article_type ON
-author.author_id=article_type.type_id WHERE 
-article_type.type_name='fake' AND NOT author_name=''
-GROUP BY author_name
-ORDER BY COUNT(author_name) DESC;
+-- List the name(s) of the most prolific author(s) of news articles of fake type. 
+-- An author is among the most prolific if it has authored as many or more fake 
+-- news articles as any other author in the dataset. 
+-- Languages: extended relational algebra and SQL
+
+-- we have to join together so we have article id, type_id and author_id together.
+
+SELECT count, author_name FROM (
+	SELECT COUNT(article_id), author_id FROM (
+		SELECT Written_by.article_id, Written_by.author_id FROM Written_by
+		INNER JOIN Is_type
+		ON Written_by.article_id = Is_type.article_id
+		WHERE Is_type.type_id = 27
+		) AS articles_authored_by
+	GROUP BY author_id
+	ORDER BY COUNT(article_id) DESC
+	) AS articles_authored_by_ordered_desc
+INNER JOIN Author
+ON articles_authored_by_ordered_desc.author_id = Author.author_id
+ORDER BY count DESC
+
+
 --3. 
 -- VERSION 1: (deprecated)
 -- SELECT COUNT(article_id), meta_keywords FROM article
