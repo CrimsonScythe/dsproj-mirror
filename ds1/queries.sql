@@ -21,6 +21,13 @@ res2 AS (
 SELECT domain.domain_url FROM domain WHERE domain.domain_id IN
 (SELECT domain_id FROM webpage INNER JOIN res2 ON webpage.article_id=res2.article_id);
 
+--1. ANOTHER VERSION ALSO works. Easier to convert to relational algebra:
+SELECT DISTINCT domain.domain_url FROM domain NATURAL JOIN (SELECT webpage.article_id,webpage.domain_id FROM 
+article NATURAL JOIN is_type NATURAL JOIN webpage
+WHERE article.scraped_at>='2018-01-15 00:00:00.000000'::date
+AND is_type.type_id=(SELECT type_id FROM article_type WHERE type_name='reliable')
+) AS foo;
+
 
 -- 2.
 -- List the name(s) of the most prolific author(s) of news articles of fake type. 
