@@ -36,7 +36,7 @@ temp_dict = dict(types)
 my_dict = dict((v,k) for k,v in temp_dict.items())
 
 
-df_chunk = pd.read_csv("1mio-raw.csv", chunksize=2000, usecols = ['id', 'type'], nrows=2000)
+df_chunk = pd.read_csv("1mio-raw.csv", chunksize=2000, usecols = ['id', 'type'])
 
 
 chunk_list = []

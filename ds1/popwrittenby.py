@@ -52,8 +52,7 @@ col_names = ['id', 'authors']
 tf_reader = pd.read_csv("1mio-raw.csv",
 						chunksize=chunksize,
 						usecols=col_names,
-						low_memory=True,
-						nrows=2000)
+						low_memory=True)
 
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor()
@@ -69,6 +68,8 @@ j = 0
 
 for df in tf_reader:
 	for index, row in df.iterrows():
+		if j % chunksize == 0:
+			print(i*j*chunksize / 1000000 * 100, "%")
 		article_id = row['id']
 		authors_string = row['authors']
 
@@ -77,8 +78,11 @@ for df in tf_reader:
 
 			for author in authors_list:
 				vals = (article_id, authors_dict[author])
-				print("vals = ({}, {})".format(article_id, authors_dict[author]))
+				#print("vals = ({}, {})".format(article_id, authors_dict[author]))
 				cur.execute(query, vals)
+
+		j += 1
+	i += 1
 				
 conn.commit()
 cur.close()
