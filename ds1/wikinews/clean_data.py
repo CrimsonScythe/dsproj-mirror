@@ -12,7 +12,8 @@ import time
 import math
 from io import StringIO
 
-def clean_df(df, print=False):
+def clean_df(df, print_df=False):
+    print("[{}][Status] Cleaning DataFrame".format(datetime.now()))
 
     column_names = [col for col in df.columns]
     """
@@ -95,6 +96,14 @@ def clean_df(df, print=False):
         df[col].replace(to_replace=r'[ \t]{2,}', value='', regex=True, inplace=True) 
         df[col].replace(to_replace=r'[\n]+', value='', regex=True, inplace=True)
 
+
+    """
+    Supply missing  
+    """
+
+    if print_df == True:
+        print("Output df:\n", df)
+
     return df
 
 # constants
@@ -102,7 +111,7 @@ def clean_df(df, print=False):
 chunksize = None
 
 now = datetime.now()
-print("[{}][Options]".format(now), "chunksize=", str(chunksize))
+print("[{}][Options] Chunksize =".format(now), str(chunksize))
 
 # regex constants
 months = r'\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may(?:ch)?|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|sept(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)(?:[.,]?) '
@@ -115,7 +124,9 @@ cur_row_index = 0
 cleaned_df_list = []
 
 # load file
+print("[{}][Status] Loading CSV file".format(datetime.now()))
 df_reader = pd.read_csv("../scrape/scrape/spiders/rwiki.csv", chunksize=chunksize)
+print("[{}][Status] Loading done".format(datetime.now()))
 
 
 if str(type(df_reader)) == "<class 'pandas.io.parsers.TextFileReader'>":
@@ -125,7 +136,7 @@ if str(type(df_reader)) == "<class 'pandas.io.parsers.TextFileReader'>":
     for df in df_reader:
         # If chunksize is set, df_reader will in fact be a df_reader
         # and we can do the following processing of each df
-        cleaned_df = clean_df(df, print=True)
+        cleaned_df = clean_df(df, print_df=True)
 
         if (cleaned_df is None):
             continue
@@ -142,7 +153,7 @@ elif str(type(df_reader)) == "<class 'pandas.core.frame.DataFrame'>":
     print("[{}][Status] df_reader is a DataFrame".format(now))
     # If chunksize is False, df_reader is actually a df. 
     # There will only be one df to process then.
-    cleaned_df = clean_df(df_reader, print=True)
+    cleaned_df = clean_df(df_reader, print_df=True)
     cleaned_df_list.append(cleaned_df)
 
 else:
@@ -152,6 +163,6 @@ else:
 df = pd.concat(cleaned_df_list) 
 
 now = datetime.now()
-print("[{}][Cleaning complete]".format(now))
+print("[{}][Status] Cleaning complete".format(now))
 
 df.to_csv('wikinews_data_clean.csv', index=False, header=False)
