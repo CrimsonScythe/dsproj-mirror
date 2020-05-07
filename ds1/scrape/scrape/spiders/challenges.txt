@@ -1,2 +1,0 @@
-1. Took a while to decide if a framework should be used (scrapy) or if libraries would suffice (beautifulsoup, lxml, requests)
-2. what to do with sub-headings on articles and what to do wth sources
