@@ -28,6 +28,15 @@ WHERE article.scraped_at>='2018-01-15 00:00:00.000000'::date
 AND is_type.type_id=(SELECT type_id FROM article_type WHERE type_name='reliable')
 ) AS foo;
 
+--1. MODIFICATION OF ABOVE, REMOVED SUBQUERY IN WHERE SO ITS EVEN EASIER TO 
+-- CONVERT TO RA now
+SELECT DISTINCT domain.domain_url FROM domain NATURAL JOIN
+(SELECT webpage.article_id,webpage.domain_id FROM 
+article NATURAL JOIN is_type NATURAL JOIN webpage
+WHERE article.scraped_at>='2018-01-15 00:00:00.000000'::date
+) AS foo
+NATURAL JOIN (SELECT article_id FROM is_type NATURAL JOIN article_type WHERE type_name='reliable') AS foo2;
+
 
 -- 2.
 -- List the name(s) of the most prolific author(s) of news articles of fake type. 
