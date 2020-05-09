@@ -226,7 +226,7 @@ f = open('yolo.csv', encoding="utf8")
 
 print("five")
 # # # writing to DB
-conn = psycopg2.connect(host = "localhost", dbname="postgres.public", user="postgres", password="root")
+conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor()
 cur.copy_from(f, 'article', sep=',')
 conn.commit()
