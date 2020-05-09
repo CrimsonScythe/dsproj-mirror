@@ -29,7 +29,12 @@ def clean_df(df, print_df=False):
     """
     global cur_row_index
     df_len = len(df)
-    df.insert(0, 'id', range(cur_row_index, cur_row_index + df_len))
+    headers = ['article_id']
+    for header in df.columns:
+        headers.append(header)
+    df.insert(0, 'article_id', range(cur_row_index, cur_row_index + df_len))
+    print(headers)
+    df.columns = headers 
     # change cur_row_index for next df to be processed.
     cur_row_index = cur_row_index + df_len
 
@@ -125,7 +130,7 @@ cleaned_df_list = []
 
 # load file
 print("[{}][Status] Loading CSV file".format(datetime.now()))
-df_reader = pd.read_csv("../scrape/scrape/spiders/rwiki.csv", chunksize=chunksize)
+df_reader = pd.read_csv("wikinews_data.csv", chunksize=chunksize)
 print("[{}][Status] Loading done".format(datetime.now()))
 
 
@@ -165,4 +170,7 @@ df = pd.concat(cleaned_df_list)
 now = datetime.now()
 print("[{}][Status] Cleaning complete".format(now))
 
-df.to_csv('wikinews_data_clean.csv', index=False, header=False)
+headers = [header for header in df.columns]
+print("[{}][Status] Headers in final dataframe: {}".format(now, headers))
+
+df.to_csv('wikinews_data_clean.csv', index=False, header=True)

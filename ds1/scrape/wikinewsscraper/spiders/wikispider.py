@@ -72,11 +72,11 @@ class Spider(scrapy.Spider):
             yield{
                 #  extract text from h1 attribute
                 'title' : response.xpath('//div[@id="content"]').xpath('child::h1[@id="firstHeading"]/text()').get(),
+                'content' :  response.xpath('//div[@id="content"]//div[@id="mw-content-text"]//child::text()[not(ancestor::h2) and not(ancestor::div/@class="infobox noprint desktop-only") and not(ancestor::span/@class="sourceTemplate") and not(ancestor::a/@class="external text") and not(ancestor::table/@id="social_bookmarks") and not(ancestor::div/@id="commentrequest") and not(ancestor::div/@class="thumbcaption") and not (ancestor::table/@class="metadata plainlinks ambox ambox-notice")]').getall(),
                 # Changed to inserted_at to adhere to FakeNews schema
                 'inserted_at' : response.xpath('//div[@id="content"]//strong[@class="published"]//span/@title').get(),
                 # like a file on the computer that's just assumme updated at == published, when we don't know anything else?
                 'updated_at' : response.xpath('//div[@id="content"]//strong[@class="published"]//span/@title').get(),
-                'content' :  response.xpath('//div[@id="content"]//div[@id="mw-content-text"]//child::text()[not(ancestor::h2) and not(ancestor::div/@class="infobox noprint desktop-only") and not(ancestor::span/@class="sourceTemplate") and not(ancestor::a/@class="external text") and not(ancestor::table/@id="social_bookmarks") and not(ancestor::div/@id="commentrequest") and not(ancestor::div/@class="thumbcaption") and not (ancestor::table/@class="metadata plainlinks ambox ambox-notice")]').getall(),
                 'url' : response.url,
                 'domain' : re.search("https?://([A-Za-z_0-9.-]+).*", response.url).group(1),
                 'scraped_at' : datetime.now(),

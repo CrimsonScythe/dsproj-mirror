@@ -29,12 +29,11 @@ CREATE TABLE wikinews.Article (
   article_id integer,
   title varchar,
   content text,
-  summary text,
-  meta_description text,
+  --meta_description text,
   inserted_at timestamp,
   updated_at timestamp,
   scraped_at timestamp,
-  meta_keywords text,
+  --meta_keywords text,
   PRIMARY KEY (article_id)
 );
 

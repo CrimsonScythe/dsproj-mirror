@@ -2,7 +2,8 @@ from scrapy.exporters import CsvItemExporter
 
 class CsvPipeline(object):
     def __init__(self):
-        self.file = open("wikinews_data_clean.csv", 'wb')
+                        # spiders .. -> wikinewsscraper .. -> scrape .. / wikinews / 
+        self.file = open("../../../wikinews/wikinews_data.csv", 'wb')
         self.exporter = CsvItemExporter(self.file)
         self.exporter.start_exporting()
 
