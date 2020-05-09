@@ -15,7 +15,6 @@ open it here for use in the copy_from function below
 
 
 df = pd.read_csv("wikinews_data_clean.csv", low_memory=True)
-print([header for header in df.columns])
 
 dfs = [
     df['title'],
@@ -42,7 +41,7 @@ cur.execute("SELECT * FROM information_schema.columns WHERE table_schema = 'wiki
 res = cur.fetchall()
 table_columns = [line[3] for line in res]
 print("Columns found in table 'article' in db:\n", table_columns)
-
+print([header for header in val.columns])
 
 cur.copy_from(f, 'postgres.wikinews.article', sep=',')
 conn.commit()

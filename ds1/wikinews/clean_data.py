@@ -82,6 +82,17 @@ def clean_df(df, print_df=False):
         """
         df[col].replace(to_replace=r'(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)', value='<URL>', regex=True, inplace=True)
 
+    def t_func(field_val):
+        print(field_val)
+        try:
+            dt_obj = datetime.strptime(str(field_val), '%Y-%m-%d')
+            return dt_obj
+        except:
+            return datetime.now()
+
+    cols = ['inserted_at', 'updated_at']
+    for col in cols:
+        df[col] = df[col].apply(t_func)
 
     """
     for the xa0 byte, some encoding stuff which creates trouble
