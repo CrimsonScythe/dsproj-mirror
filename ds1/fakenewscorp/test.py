@@ -20,10 +20,25 @@ for d in lst:
     for k in missing_keys:
         d[k] = 0
 
+
+for t in lst:
+    print(len(t))        
+
 dd = defaultdict(list)
 
 for d in lst: # you can list as many input dicts as you want here
     for key, value in d.items():
         dd[key].append(value)
 
-print(dd)        
+print(dd)
+
+# for dic in lst:
+
+# if 'a' in lst:
+#     print('yes')        
+
+# print(dd)
+# num = list(dd.keys())[0]
+# print(dd[num])
+# print(len(dd[num]))  
+# print(len(dd))      
