@@ -1,44 +1,16 @@
 from collections import defaultdict
-
-lst = list()
-d1 = {'a':2, 'b':4, 'c':8}
-d2 = {'a':1, 'b':2, 'c':3, 'd':5}
-d3 = {'a':0}
-
-lst.append(d1)
-lst.append(d2)
-lst.append(d3)
+import numpy as np
+import psycopg2
 
 
-max_dict=lst[1]
-# print(max_dict)
+sett = set()
 
-for d in lst:
-    if (d==max_dict):
-        continue
-    missing_keys = set(max_dict.keys()) - set(d.keys())
-    for k in missing_keys:
-        d[k] = 0
+sett.add("a")
+sett.add("b")
+sett.add("c")
+sett.add("d")
+sett.add("e")
+sett.add("f")
 
-
-for t in lst:
-    print(len(t))        
-
-dd = defaultdict(list)
-
-for d in lst: # you can list as many input dicts as you want here
-    for key, value in d.items():
-        dd[key].append(value)
-
-print(dd)
-
-# for dic in lst:
-
-# if 'a' in lst:
-#     print('yes')        
-
-# print(dd)
-# num = list(dd.keys())[0]
-# print(dd[num])
-# print(len(dd[num]))  
-# print(len(dd))      
+dic = {k: v for v, k in enumerate(sett)}
+print(dic['b'])

@@ -4,6 +4,9 @@ import numpy as np
 from collections import defaultdict
 import math
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn import linear_model
+from sklearn.model_selection import train_test_split
 
 tf_dict = dict()
 idf_dict = dict()
@@ -13,28 +16,34 @@ l = list()
 idf_l = list()
 
 index=0
-num_docs=3
+num_docs=1000
 
 conn1 = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur1 = conn1.cursor() 
-cur1.execute('SELECT content FROM article LIMIT 3;')
+cur1.execute('SELECT content FROM article ORDER BY article_id LIMIT 1000;')
 content = cur1.fetchall()
 # content is a list
 # content[0] is a tuple
 # content[0][0] is a str
 
+cur2 = conn1.cursor('foo')
+cur2.execute('SELECT type_id FROM is_type ORDER BY article_id LIMIT 1000;')
+types = cur2.fetchall()
+
+t_list = map(lambda  x: x[0],types)
+t_list=list(t_list)
+
 print("\nMAP\n")
 
-# s_list = map(lambda x: x[0],content)
-# s_list = list(s_list)
-# print(s_list)
+s_list = map(lambda x: x[0],content)
+s_list = list(s_list)
 
 
-for x in content:
+for x in s_list:
     
     f_dict = dict()
-    string=x[0] #convert from typle to str
-    lst = string.split()
+    # string=x[0] #convert from typle to str
+    lst = x.split()
     wCount = len(lst)
     # add words to vocabulary list
     counted = False
@@ -65,6 +74,7 @@ for x in content:
     # calcualte  the inf value
     for dic in l:
         dic['freq'][index] = dic['freq'][index]/wCount
+        
 
     # recall that templist contains all unique words from the current article
     # as it contains unique words we only count the occurence of any word once even if it appears multiple times in a document
@@ -111,6 +121,52 @@ for dic in l:
 
 print('2')
 
-# count_vect = CountVectorizer()
-# X_train_counts = count_vect.fit_transform(content)
-# X_train_counts.shape
+
+count_vect = CountVectorizer()
+X_train_counts = count_vect.fit_transform(s_list)
+print(X_train_counts.shape)
+
+tf_transformer = TfidfTransformer().fit(X_train_counts)
+X_train_tf = tf_transformer.transform(X_train_counts)
+# print(X_train_tf.shape)
+
+# X = X_train_tf
+# Y = t_list
+# clf = linear_model.SGDClassifier(max_iter=1000, tol=1e-3)
+# clf.fit(X, Y)
+
+# print(X)
+
+# print("x shape"+str(X.shape))
+# print("\n") 
+
+
+X = list(map(lambda x: x['freq'], l))
+
+numpy_array = np.array(X)
+transpose = numpy_array.T
+
+
+X=transpose.tolist()
+
+# print("x1 shape"+str(X1.shape))
+
+# X = X_train_tf
+
+Y = t_list
+
+X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=1)
+
+# print(X)
+
+clf2 = linear_model.SGDClassifier(max_iter=1000, tol=1e-3)
+clf2.fit(X_train, y_train)
+
+
+# score1=clf.score(s_list, t_list)]
+
+# this implicitly calls predict() 
+score2=clf2.score(X_test, y_test)
+
+# print("score1 "+str(score1))
+print("score2 "+str(score2))
