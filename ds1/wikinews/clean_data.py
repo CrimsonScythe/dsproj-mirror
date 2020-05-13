@@ -112,6 +112,7 @@ def clean_df(df, print_df=False):
         df[col].replace(to_replace=r'[ \t]{2,}', value='', regex=True, inplace=True) 
         df[col].replace(to_replace=r'[\n]+', value='', regex=True, inplace=True)
 
+    df['content'].replace(to_replace='"', value='', regex=True, inplace=True)
 
     """
     Supply missing  
