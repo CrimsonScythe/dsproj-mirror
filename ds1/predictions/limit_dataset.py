@@ -59,9 +59,9 @@ class LimitDataSet():
 		return df
 
 
-		def ToCSV(n_of_each_type = 1000):
+		def ToCSV(filename, n_of_each_type = 1000):
 			df = createDataFrame(n_of_each_type)
-			df.to_csv("DataSet{}".format(n_of_each_type), headers=False)
+			df.to_csv(filename, headers=False)
 
 		def ToDataFrame(n_of_each_type = 1000):
 			return createDataFrame(n_of_each_type)
