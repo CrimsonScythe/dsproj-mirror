@@ -228,6 +228,6 @@ print("five")
 # # # writing to DB
 conn = psycopg2.connect(host = "localhost", dbname="postgres", user="postgres", password="root")
 cur = conn.cursor()
-cur.copy_from(f, 'article', sep=',')
+cur.copy_from(f, 'fakenewscorp.article', sep=',')
 conn.commit()
 cur.close()
